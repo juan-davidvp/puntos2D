@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser;
 
@@ -78,6 +79,35 @@ public class UIpuntosController implements Initializable {
 
     } //Funcion para obtener la informacion del canva
 
+    
+    public void openFile(ActionEvent e){
+    
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Abrir Archivo JSON");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Archivos JSON", "*.json"),
+                new FileChooser.ExtensionFilter("Todos los archivos", "*.*")
+        );
+    
+         File archivo = fileChooser.showOpenDialog(s);
+         
+         if (archivo != null) {
+            try {
+                ObjectMapper objectMapper = new ObjectMapper();
+                Puntos.addAll(Arrays.asList(objectMapper.readValue(archivo, Punto[].class)));
+                llenarList();
+                labelX.setText(String.valueOf("X: "));
+                labelY.setText(String.valueOf("Y: "));
+
+                System.out.println("Archivo cargado exitosamente desde: " + archivo.getPath());
+            } catch (IOException a) {
+                a.printStackTrace();
+                System.err.println("Error al cargar el archivo JSON.");
+            }
+        }
+    }
+    
+    
     public void saveFile(ActionEvent e) {
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -130,7 +160,8 @@ public class UIpuntosController implements Initializable {
 
         listaPuntos.getItems().clear();
         Punto newPunto = crearPunto(lista[0], lista[1]);
-        Puntos.add(0, newPunto);
+        Puntos.addFirst(newPunto);
+        System.out.println(newPunto);
         llenarList();
         labelX.setText(String.valueOf("X: "));
         labelY.setText(String.valueOf("Y: "));
@@ -142,7 +173,7 @@ public class UIpuntosController implements Initializable {
 
         listaPuntos.getItems().clear();
         Punto newPunto = crearPunto(lista[0], lista[1]);
-        Puntos.add(newPunto);
+        Puntos.addLast(newPunto);
         llenarList();
         labelX.setText(String.valueOf("X: "));
         labelY.setText(String.valueOf("Y: "));
@@ -176,9 +207,20 @@ public class UIpuntosController implements Initializable {
     @FXML
     private void seleccionarPunto(MouseEvent event) {
 
-        //int index = listaPuntos.getSelectionModel().getSelectedIndex();
+        int index = listaPuntos.getSelectionModel().getSelectedIndex();
+        for (int i = 0; i < Puntos.size(); i++) {
+            if(index==i){
+                
+                
+                labelX.setText(String.valueOf("X: " + Puntos.get(i).x));
+                labelY.setText(String.valueOf("Y:" + Puntos.get(i).y));
+            
+            }
+            
+        }
         String punto = listaPuntos.getSelectionModel().getSelectedItem();
-        System.out.println(punto);
+        String[] partsPunto = punto.split(",");
+        
 
     }//Funcion para seleccionar un punto de la lista y mostrarlo
 
